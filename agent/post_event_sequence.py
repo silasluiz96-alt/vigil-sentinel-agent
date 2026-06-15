@@ -243,6 +243,9 @@ def enviar_etapa_presente(lead_id: str, etapa: int) -> dict:
         return {"status": "erro", "motivo": "Lead não encontrado"}
     lead      = lead[0]
 
+    if lead.get("opt_out"):
+        return {"status": "pulado", "motivo": "Lead optou por não receber comunicações (LGPD)"}
+
     config    = ETAPAS_PRESENTES[etapa]
     abriu     = _abriu_etapa_anterior(lead_id, etapa, "presente", db)
     assunto   = config["assunto"] if abriu else config["assunto_alt"]
@@ -272,6 +275,9 @@ def enviar_etapa_noshow(lead_id: str, etapa: int) -> dict:
     if not lead:
         return {"status": "erro", "motivo": "Lead não encontrado"}
     lead      = lead[0]
+
+    if lead.get("opt_out"):
+        return {"status": "pulado", "motivo": "Lead optou por não receber comunicações (LGPD)"}
 
     config    = ETAPAS_NOSHOW[etapa]
     abriu     = _abriu_etapa_anterior(lead_id, etapa, "noshow", db)

@@ -72,8 +72,8 @@ def revogar_consentimento(email: str) -> dict:
 
     lid = lead[0]["id"]
 
-    # Cancela inscrições ativas sem excluir o registro (evita reenvio acidental)
-    db.table("inscricoes").update({"status": "no_show"}).eq("lead_id", lid).execute()
+    # Marca opt_out no lead — bloqueia envios futuros sem apagar o registro
+    db.table("leads").update({"opt_out": True}).eq("id", lid).execute()
 
     return {
         "status":   "consentimento_revogado",

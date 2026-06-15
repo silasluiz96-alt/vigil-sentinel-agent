@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS leads (
     linkedin         TEXT,
     areas_interesse  TEXT[],  -- ex: {"Conformidade regulatória","Liderança"}
     formacao_atual   TEXT,    -- ex: "MBA em Gestão de TI", "CISSP em andamento"
+    opt_out          BOOLEAN DEFAULT FALSE,  -- revogação de consentimento (LGPD Art. 8º §5º)
     created_at       TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -188,5 +189,5 @@ GROUP BY l.id, l.nome, l.email, l.cargo, l.empresa,
 -- Dados iniciais: evento Vigil Summit
 -- ============================================================
 INSERT INTO eventos (nome, data, local, capacidade)
-VALUES ('Vigil Summit — Segurança para a Era da IA', '2026-08-15', 'São Paulo, SP', 120)
+VALUES ('Vigil Summit — Segurança para a Era da IA', '2026-09-20', 'São Paulo, SP', 120)
 ON CONFLICT DO NOTHING;

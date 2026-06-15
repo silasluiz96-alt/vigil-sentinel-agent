@@ -273,6 +273,9 @@ def enviar_etapa(lead_id: str, etapa: int) -> dict:
         return {"status": "erro", "motivo": "Lead não encontrado"}
     lead = lead[0]
 
+    if lead.get("opt_out"):
+        return {"status": "pulado", "motivo": "Lead optou por não receber comunicações (LGPD)"}
+
     config = ETAPAS[etapa]
 
     # Etapas 4 e 5 só para confirmados

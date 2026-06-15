@@ -53,7 +53,7 @@ st.markdown("""
 st.markdown("# 🛡️ Vigil Summit 2026")
 st.markdown("### Segurança para a Era da IA")
 st.markdown("""
-**15 de agosto de 2026 · São Paulo, SP · Evento exclusivo — 120 vagas**
+**20 e 21 de setembro de 2026 · São Paulo, SP · Evento exclusivo — 120 vagas**
 
 Um dia inteiro dedicado a CISOs, CTOs e gestores de risco que precisam
 tomar decisões de segurança em um mundo onde a IA redefine as ameaças a cada semana.
