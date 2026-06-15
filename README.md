@@ -163,32 +163,6 @@ disparar_pos_evento()                 # separa presentes de no-shows automaticam
 
 ---
 
-## Personas de teste
-
-Para demonstrar o fluxo ponta a ponta sem dados reais, insira os leads abaixo via landing page ou diretamente no Supabase:
-
-| Nome | Cargo | Empresa | Área de interesse | Formação | Perfil esperado |
-|---|---|---|---|---|---|
-| Ana Ribeiro | CISO | Banco Meridional | Conformidade regulatória, Gestão de riscos | CISSP em andamento | **Score Alta** — decisora, setor financeiro, certificação de segurança |
-| Carlos Mendes | Gerente de TI | Saúde Total S.A. | Proteção de dados, Segurança em cloud | MBA em Gestão | **Score Média** — setor relevante, cargo intermediário, trajetória de crescimento |
-| Fernanda Costa | Analista de Segurança | FinTech Nova | Automação de segurança | Graduação em Sistemas | **Score Média** — setor estratégico, cargo operacional, área alinhada ao produto |
-| Roberto Alves | Diretor de TI | Manufatura BR | Liderança e gestão de times | Especialização em TI | **Score Baixa** — cargo alto mas setor periférico, sem formação em segurança |
-| Juliana Prates | CTO | GovTech Brasil | Conformidade regulatória, Resposta a incidentes | Pós em Cibersegurança | **Score Alta** — decisora técnica, setor governo, formação e interesse diretos |
-
----
-
-## Plano de execução (5 dias)
-
-| Dia | Entregável |
-|---|---|
-| **Dia 1** | Schema do banco, landing page com LGPD, módulo de enriquecimento |
-| **Dia 2** | Lead scoring (ML), régua pré-evento, política de privacidade |
-| **Dia 3** | Régua pós-evento, módulo de direitos LGPD, trigger de auditoria |
-| **Dia 4** | Inteligência de mercado, Promoter Brief (LangGraph), dashboard |
-| **Dia 5** | Testes de ponta a ponta, ajustes de qualidade, documentação |
-
----
-
 ## Cenário de escala
 
 Para um evento com 10x o volume (1.200 leads):
