@@ -86,6 +86,23 @@ CREATE TABLE IF NOT EXISTS reunioes (
 );
 
 -- ============================================================
+-- Inteligência de mercado por empresa
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS inteligencia_empresa (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    empresa         TEXT NOT NULL UNIQUE,
+    incidentes      TEXT,   -- vazamentos, multas, vulnerabilidades públicas
+    inovacao        TEXT,   -- IA, cloud, transformação digital, novos produtos
+    movimento_rh    TEXT,   -- contratações em TI/segurança, expansão de equipe
+    conformidade    TEXT,   -- certificações em andamento, regulatório, auditorias
+    crescimento     TEXT,   -- fusões, aquisições, novas unidades, expansão
+    resumo_vendas   TEXT,   -- síntese estratégica pronta para o promotor usar
+    raw_data        JSONB,
+    coletado_em     TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ============================================================
 -- Auditoria: registra toda mudança de status nas inscrições
 -- ============================================================
 
