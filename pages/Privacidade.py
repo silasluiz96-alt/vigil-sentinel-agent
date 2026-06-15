@@ -20,7 +20,6 @@ pela **Pareto**, para fins exclusivos de gestão do evento Vigil Summit 2026.
 |---|---|---|
 | Nome, e-mail, telefone | Confirmação de inscrição e comunicações do evento | Consentimento — Art. 7º, I |
 | Cargo e empresa | Personalização das comunicações e qualificação do público | Interesse legítimo — Art. 7º, IX |
-| LinkedIn | Enriquecimento de perfil com dados públicos | Interesse legítimo — Art. 7º, IX |
 | Áreas de interesse e formação | Personalização de conteúdo e pontuação de propensão | Consentimento — Art. 7º, I |
 
 ## 3. Decisões automatizadas (Art. 20º)

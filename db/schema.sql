@@ -35,9 +35,6 @@ CREATE TABLE IF NOT EXISTS enriquecimento (
     empresa_confirmada  TEXT,
     setor               TEXT,
     tamanho_empresa     TEXT,
-    linkedin_encontrado    BOOLEAN DEFAULT FALSE,
-    linkedin_atividade     TEXT CHECK (linkedin_atividade IN ('Alta','Média','Baixa','Não encontrado')),
-    linkedin_observacao    TEXT,  -- o que foi inferido publicamente (sem dados privados)
     sinais_interesse       TEXT,
     resumo_perfil          TEXT,
     raw_data               JSONB,

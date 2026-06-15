@@ -54,19 +54,6 @@ PESO_TAMANHO = {
     "até 50": 0.2,
 }
 
-# Áreas de interesse alinhadas ao produto Vigil.AI
-# Quanto mais próxima do core do produto, maior o peso
-# Formação atual — palavras-chave que indicam trajetória relevante
-# Certificações de segurança e gestão recebem peso máximo
-# Atividade no LinkedIn — inferida de dados públicos via Tavily + LLM
-# Alta atividade = profissional exposto a tendências, mais receptivo digitalmente
-PESO_LINKEDIN_ATIVIDADE = {
-    "Alta": 0.9,
-    "Média": 0.6,
-    "Baixa": 0.3,
-    "Não encontrado": 0.1,
-}
-
 PESO_FORMACAO = {
     # Certificações diretas de segurança
     "cissp": 1.0, "cism": 1.0, "cisa": 0.95,
@@ -147,37 +134,6 @@ def _f_engajamento(lead_id: str, db) -> float:
     return engajados / len(comunicacoes)
 
 
-def _f_linkedin_atividade(enriquecimento: dict) -> float:
-    """
-    Atividade pública no LinkedIn cruzada com situação profissional declarada.
-
-    A leitura correta depende do contexto:
-    - Sem empresa + alta atividade → possivelmente em busca de emprego.
-      Não é comprador hoje, mas pode ser em nova posição. Score moderado.
-    - Com empresa + baixa atividade → profissional desengajado, sem
-      ambição visível. Menor receptividade a novas ferramentas.
-    - Com empresa + alta atividade → engajado, quer crescer e se destacar.
-      Mais receptivo: vai defender internamente ferramentas que o façam
-      parecer antenado para a liderança. Score mais alto.
-    """
-    nivel   = enriquecimento.get("linkedin_atividade") or "Não encontrado"
-    empresa = enriquecimento.get("empresa_confirmada") or ""
-    tem_empresa = bool(empresa.strip())
-
-    peso_base = PESO_LINKEDIN_ATIVIDADE.get(nivel, 0.1)
-
-    if not tem_empresa and nivel == "Alta":
-        return 0.4   # ativo mas possivelmente desempregado — não é comprador hoje
-
-    if tem_empresa and nivel == "Alta":
-        return 1.0   # engajado + empregado = perfil ideal de promotor interno
-
-    if tem_empresa and nivel == "Baixa":
-        return 0.2   # empregado mas desengajado — abordagem presencial é mais eficaz
-
-    return peso_base
-
-
 def _f_formacao_atual(formacao: str) -> float:
     """
     Campo livre — o lead descreve o que estuda com suas próprias palavras.
@@ -215,7 +171,6 @@ def extrair_features(lead_id: str, enriquecimento: dict, areas: list, formacao: 
         _f_tamanho(enriquecimento),
         _f_areas_interesse(areas),
         _f_formacao_atual(formacao),
-        _f_linkedin_atividade(enriquecimento),
         _f_engajamento(lead_id, db),
         _f_compareceu(lead_id, db),
     ]])
@@ -223,37 +178,37 @@ def extrair_features(lead_id: str, enriquecimento: dict, areas: list, formacao: 
 
 # ------------------------------------------------------------------
 # Dataset sintético para treino
-# [cargo, setor, tamanho, area_interesse, formacao, linkedin_atividade, engajamento, compareceu, converteu]
+# [cargo, setor, tamanho, area_interesse, formacao, engajamento, compareceu, converteu]
 # ------------------------------------------------------------------
 
 DADOS_TREINO = [
-    # Decisores claros, ativos no LinkedIn → alto potencial
-    [1.0,  1.0,  1.0,  1.0,  0.95, 0.9, 0.9, 1.0, 1],
-    [0.95, 1.0,  0.85, 0.95, 0.85, 0.9, 0.8, 1.0, 1],
-    [0.9,  0.95, 1.0,  0.9,  0.9,  0.6, 0.7, 1.0, 1],
-    [0.85, 0.9,  0.85, 0.85, 0.8,  0.9, 0.6, 1.0, 1],
-    [1.0,  0.8,  0.7,  1.0,  0.0,  0.6, 0.5, 0.0, 1],
-    [0.7,  0.65, 0.7,  0.8,  0.75, 0.6, 0.8, 1.0, 1],
+    # Decisores claros, alto engajamento → alto potencial
+    [1.0,  1.0,  1.0,  1.0,  0.95, 0.9, 1.0, 1],
+    [0.95, 1.0,  0.85, 0.95, 0.85, 0.8, 1.0, 1],
+    [0.9,  0.95, 1.0,  0.9,  0.9,  0.7, 1.0, 1],
+    [0.85, 0.9,  0.85, 0.85, 0.8,  0.6, 1.0, 1],
+    [1.0,  0.8,  0.7,  1.0,  0.0,  0.5, 0.0, 1],
+    [0.7,  0.65, 0.7,  0.8,  0.75, 0.8, 1.0, 1],
     # Analista com sinais fortes de ascensão → comprador futuro
-    [0.3,  0.85, 0.7,  1.0,  1.0,  0.9, 0.6, 1.0, 1],  # fazendo CISSP, ativo no LinkedIn
-    [0.3,  0.6,  0.45, 0.9,  0.85, 0.6, 0.5, 0.0, 1],  # MBA, atividade média
-    # Decisor mas inativo digitalmente → abordagem presencial
-    [0.85, 0.8,  0.85, 0.8,  0.0,  0.1, 0.2, 1.0, 1],  # converteu via evento presencial
-    [0.7,  0.7,  0.7,  0.7,  0.0,  0.1, 0.1, 0.0, 0],  # inativo, não compareceu → perdido
+    [0.3,  0.85, 0.7,  1.0,  1.0,  0.6, 1.0, 1],  # fazendo CISSP
+    [0.3,  0.6,  0.45, 0.9,  0.85, 0.5, 0.0, 1],  # MBA, engajado nos e-mails
+    # Decisor mas sem engajamento → abordagem presencial
+    [0.85, 0.8,  0.85, 0.8,  0.0,  0.2, 1.0, 1],  # converteu via evento presencial
+    [0.7,  0.7,  0.7,  0.7,  0.0,  0.1, 0.0, 0],  # sem engajamento, não compareceu
     # Cargo operacional, sem sinais de crescimento → baixo potencial
-    [0.3,  0.5,  0.45, 0.5,  0.1,  0.3, 0.4, 0.0, 0],
-    [0.7,  0.5,  0.7,  0.3,  0.0,  0.3, 0.3, 0.0, 0],
-    [0.5,  0.6,  0.45, 0.2,  0.1,  0.1, 0.2, 0.0, 0],
-    [0.3,  0.4,  0.2,  0.0,  0.0,  0.1, 0.1, 0.0, 0],
-    [0.3,  0.5,  0.45, 0.0,  0.0,  0.1, 0.0, 0.0, 0],
-    [0.85, 0.85, 0.85, 0.9,  0.85, 0.9, 0.6, 1.0, 1],
-    [0.9,  0.9,  1.0,  0.95, 0.9,  0.9, 0.9, 1.0, 1],
-    [0.1,  0.4,  0.2,  0.0,  0.0,  0.1, 0.0, 0.0, 0],
-    [0.5,  0.65, 0.45, 0.75, 0.6,  0.6, 0.5, 0.0, 0],
+    [0.3,  0.5,  0.45, 0.5,  0.1,  0.4, 0.0, 0],
+    [0.7,  0.5,  0.7,  0.3,  0.0,  0.3, 0.0, 0],
+    [0.5,  0.6,  0.45, 0.2,  0.1,  0.2, 0.0, 0],
+    [0.3,  0.4,  0.2,  0.0,  0.0,  0.1, 0.0, 0],
+    [0.3,  0.5,  0.45, 0.0,  0.0,  0.0, 0.0, 0],
+    [0.85, 0.85, 0.85, 0.9,  0.85, 0.6, 1.0, 1],
+    [0.9,  0.9,  1.0,  0.95, 0.9,  0.9, 1.0, 1],
+    [0.1,  0.4,  0.2,  0.0,  0.0,  0.0, 0.0, 0],
+    [0.5,  0.65, 0.45, 0.75, 0.6,  0.5, 0.0, 0],
 ]
 
-_X = np.array([d[:8] for d in DADOS_TREINO])
-_y = np.array([d[8]  for d in DADOS_TREINO])
+_X = np.array([d[:7] for d in DADOS_TREINO])
+_y = np.array([d[7]  for d in DADOS_TREINO])
 
 _modelo = DecisionTreeClassifier(max_depth=4, random_state=42)
 _modelo.fit(_X, _y)

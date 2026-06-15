@@ -103,7 +103,7 @@ Score de propensão: {score} ({rotulo})
 Áreas de interesse: {areas_interesse}
 Formação atual: {formacao_atual}
 Perfil resumido: {resumo_perfil}
-Atividade LinkedIn: {linkedin_atividade}
+Sinais de interesse públicos: {sinais_interesse}
 
 === INTELIGÊNCIA DA EMPRESA ===
 Inovação recente: {inovacao}
@@ -145,7 +145,7 @@ def gerar_brief(state: BriefState) -> BriefState:
         areas_interesse=", ".join(lead.get("areas_interesse") or []) or "Não informado",
         formacao_atual=lead.get("formacao_atual") or "Não informado",
         resumo_perfil=enr.get("resumo_perfil") or "",
-        linkedin_atividade=enr.get("linkedin_atividade") or "Não encontrado",
+        sinais_interesse=enr.get("sinais_interesse") or "Sem dados",
         inovacao=intel.get("inovacao") or "Sem dados",
         incidentes=intel.get("incidentes") or "Sem dados",
         movimento_rh=intel.get("movimento_rh") or "Sem dados",

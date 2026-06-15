@@ -2,7 +2,7 @@
 Agente de Enriquecimento de Leads — Fase 2 do funil.
 
 Para cada lead captado, o agente:
-  1. Pesquisa nome + empresa na web via Tavily
+  1. Pesquisa nome + empresa na web via Tavily (perfil profissional e contexto da empresa)
   2. Envia os resultados ao LLM para extração estruturada de dados
   3. Salva o perfil enriquecido no Supabase
   4. Dispara o cálculo de score (lead_scoring.py)
@@ -42,18 +42,9 @@ JSON esperado:
   "empresa_confirmada": "nome oficial da empresa",
   "setor": "setor de atuação (ex: Financeiro, Saúde, Tecnologia)",
   "tamanho_empresa": "faixa de funcionários (ex: 200-500, acima de 1000)",
-  "linkedin_encontrado": true ou false,
-  "linkedin_atividade": "Alta, Média, Baixa ou Não encontrado",
-  "linkedin_observacao": "o que foi observado publicamente: posts recentes, artigos, ausência de rastros etc.",
   "sinais_interesse": "evidências públicas de interesse em segurança, compliance ou TI",
   "resumo_perfil": "2-3 frases sobre o perfil profissional para personalizar comunicações"
 }}
-
-Critérios para linkedin_atividade:
-- Alta: posts ou artigos recentes indexados, menções em eventos, conteúdo publicado nos últimos meses
-- Média: perfil encontrado mas sem publicações recentes visíveis
-- Baixa: perfil existe mas completamente inativo, sem rastros de conteúdo
-- Não encontrado: nenhum perfil identificado nos resultados
 
 Se um campo não for encontrado, use null. Nunca invente informações nem acesse dados privados.
 """
@@ -61,15 +52,13 @@ Se um campo não for encontrado, use null. Nunca invente informações nem acess
 
 def _buscar_na_web(nome: str, empresa: str) -> dict:
     """
-    Pesquisa o lead na web via Tavily com três ângulos:
+    Pesquisa o lead na web via Tavily com dois ângulos:
     1. Perfil profissional e cargo
-    2. Atividade pública no LinkedIn (posts, artigos indexados)
-    3. Contexto da empresa (setor, porte, maturidade em segurança)
-    Apenas dados públicos — nenhuma tentativa de acessar perfis privados.
+    2. Contexto da empresa (setor, porte, maturidade em segurança)
+    Apenas dados públicos indexados na web.
     """
     queries = [
-        f"{nome} {empresa} LinkedIn cargo",
-        f"{nome} LinkedIn posts artigos publicações site:linkedin.com",
+        f"{nome} {empresa} cargo profissional",
         f"{empresa} setor segurança cibernética compliance funcionários",
     ]
     resultados = []
@@ -126,27 +115,15 @@ def enriquecer_lead(lead_id: str) -> dict:
     resultados_web = _buscar_na_web(nome, empresa)
     perfil = _extrair_perfil(nome, empresa, resultados_web)
 
-    linkedin_encontrado = perfil.get("linkedin_encontrado")
-    if isinstance(linkedin_encontrado, str):
-        linkedin_encontrado = linkedin_encontrado.lower() == "true"
-
-    atividade_valida = {"Alta", "Média", "Baixa", "Não encontrado"}
-    linkedin_atividade = perfil.get("linkedin_atividade")
-    if linkedin_atividade not in atividade_valida:
-        linkedin_atividade = "Não encontrado"
-
     db.table("enriquecimento").upsert({
-        "lead_id": lead_id,
-        "cargo_real":            perfil.get("cargo_real"),
-        "empresa_confirmada":    perfil.get("empresa_confirmada"),
-        "setor":                 perfil.get("setor"),
-        "tamanho_empresa":       perfil.get("tamanho_empresa"),
-        "linkedin_encontrado":   linkedin_encontrado or False,
-        "linkedin_atividade":    linkedin_atividade,
-        "linkedin_observacao":   perfil.get("linkedin_observacao"),
-        "sinais_interesse":      perfil.get("sinais_interesse"),
-        "resumo_perfil":         perfil.get("resumo_perfil"),
-        "raw_data":              perfil,
+        "lead_id":            lead_id,
+        "cargo_real":         perfil.get("cargo_real"),
+        "empresa_confirmada": perfil.get("empresa_confirmada"),
+        "setor":              perfil.get("setor"),
+        "tamanho_empresa":    perfil.get("tamanho_empresa"),
+        "sinais_interesse":   perfil.get("sinais_interesse"),
+        "resumo_perfil":      perfil.get("resumo_perfil"),
+        "raw_data":           perfil,
     }, on_conflict="lead_id").execute()
 
     # Recalcula o score com os dados frescos
