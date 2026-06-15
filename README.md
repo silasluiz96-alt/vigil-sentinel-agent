@@ -1,7 +1,8 @@
 # Vigil Sentinel Agent
 
 **Case técnico**
- **Silas Luiz Bom Fim**
+
+**Silas Luiz Bom Fim**
 
 Sistema autônomo de gestão de funil para o evento **Vigil Summit 2026 — Segurança para a Era da IA** (120 participantes, público B2B: CISOs, CTOs e Diretores de TI).
 
@@ -216,4 +217,4 @@ Para um evento com 10x o volume (1.200 leads):
 ---
 
 *Desenvolvido por Silas Luiz Bom Fim — junho de 2026*
-*Contato: ajbomfim.dev@gmail.com*
+*Contato: silas.luiz.96@gmail.com*
