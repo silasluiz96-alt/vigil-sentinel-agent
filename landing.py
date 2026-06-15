@@ -110,9 +110,19 @@ with st.form("inscricao", clear_on_submit=True):
         help="Campo livre — compartilhe cursos, certificações ou graduações em andamento.",
     )
 
+    st.markdown("---")
+    consentimento = st.checkbox(
+        "Concordo com o tratamento dos meus dados pessoais conforme a "
+        "[Política de Privacidade](Privacidade) e a LGPD (Lei 13.709/2018), "
+        "para fins exclusivos de comunicação relacionada ao Vigil Summit. "
+        "Sei que posso revogar este consentimento a qualquer momento.",
+        value=False,
+    )
     st.markdown(
-        "<small>✅ Seus dados são tratados conforme a LGPD e usados exclusivamente "
-        "para comunicações relacionadas ao Vigil Summit.</small>",
+        "<small>🔒 Seus dados são armazenados com segurança e não serão compartilhados "
+        "com terceiros. Utilizamos scoring automatizado para personalizar comunicações — "
+        "você pode solicitar revisão humana a qualquer momento pelo e-mail "
+        "privacidade@vigilsummit.com.br</small>",
         unsafe_allow_html=True,
     )
 
@@ -127,6 +137,9 @@ if submitted:
 
     if faltando:
         st.error(f"Preencha os campos obrigatórios: {', '.join(faltando)}")
+
+    elif not consentimento:
+        st.error("É necessário aceitar os termos de consentimento para prosseguir (Art. 8º LGPD).")
 
     elif not areas:
         st.error("Selecione ao menos uma área de interesse.")

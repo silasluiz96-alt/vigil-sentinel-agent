@@ -142,6 +142,16 @@ Instrução específica para este e-mail:
 
 Retorne APENAS o corpo do e-mail em HTML simples (sem <html>, <head> ou <body>).
 Máximo 250 palavras. Tom: profissional, humano, nunca genérico.
+
+Inclua SEMPRE ao final, após o conteúdo principal, o seguinte rodapé de conformidade LGPD
+(não altere o texto, apenas insira-o):
+
+<hr style="border:none;border-top:1px solid #eee;margin:24px 0"/>
+<p style="font-size:11px;color:#999;text-align:center;">
+Você recebe este e-mail por ter se inscrito no Vigil Summit 2026.<br>
+Para cancelar o recebimento, <a href="https://vigilsummit.com.br/descadastro?email={email}">clique aqui</a>.<br>
+Seus dados são tratados conforme a <a href="https://vigilsummit.com.br/privacidade">Política de Privacidade</a> e a LGPD (Lei 13.709/2018).
+</p>
 """
 
 
