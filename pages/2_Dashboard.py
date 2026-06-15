@@ -15,7 +15,6 @@ Arquitetura compatível com Claude (Anthropic). Chave OpenAI em uso
 por disponibilidade durante o desenvolvimento.
 """
 
-import os
 import streamlit as st
 import pandas as pd
 from datetime import datetime
@@ -33,6 +32,49 @@ st.set_page_config(
     page_icon="🛡️",
     layout="wide",
 )
+
+# ------------------------------------------------------------------
+# Login — acesso restrito à equipe Vigil.AI
+# ------------------------------------------------------------------
+
+STAFF_CREDENTIALS = dict(st.secrets.get("staff", {}))
+
+if "autenticado" not in st.session_state:
+    st.session_state.autenticado = False
+
+if not st.session_state.autenticado:
+    st.markdown("""
+    <div style="display:flex;justify-content:center;margin-top:80px">
+      <div style="background:#0d1628;border:1px solid #1e3a5f;border-radius:16px;
+                  padding:48px 40px;width:100%;max-width:420px;text-align:center">
+        <div style="font-size:48px;margin-bottom:8px">🛡️</div>
+        <h2 style="color:#38bdf8;margin-bottom:4px">Vigil Sentinel</h2>
+        <p style="color:#64748b;font-size:13px;margin-bottom:32px">
+          Acesso restrito · Somente Staff do evento
+        </p>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    with st.form("login_form"):
+        col_l, col_c, col_r = st.columns([1, 2, 1])
+        with col_c:
+            email_login = st.text_input("E-mail", placeholder="staff@vigilsummit.com.br")
+            senha_login = st.text_input("Senha", type="password")
+            entrar = st.form_submit_button("Entrar →", use_container_width=True)
+
+    if entrar:
+        if STAFF_CREDENTIALS.get(email_login) == senha_login:
+            st.session_state.autenticado = True
+            st.rerun()
+        else:
+            st.error("Credenciais inválidas.")
+
+    st.stop()
+
+# ------------------------------------------------------------------
+# A partir daqui só quem autenticou chega
+# ------------------------------------------------------------------
 
 # Tema cybersegurança — mesma identidade visual da landing page
 st.markdown("""

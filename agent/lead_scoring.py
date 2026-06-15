@@ -226,8 +226,8 @@ def calcular_score(lead_id: str) -> dict:
     db = get_supabase()
 
     lead = db.table("leads").select("areas_interesse, formacao_atual").eq("id", lead_id).execute().data
-    areas    = lead[0].get("areas_interesse") or [] if lead else []
-    formacao = lead[0].get("formacao_atual") or ""  if lead else ""
+    areas    = (lead[0].get("areas_interesse") or []) if lead else []
+    formacao = (lead[0].get("formacao_atual") or "")  if lead else ""
 
     enr = db.table("enriquecimento").select("*").eq("lead_id", lead_id).execute().data
     enriquecimento = enr[0] if enr else {}
