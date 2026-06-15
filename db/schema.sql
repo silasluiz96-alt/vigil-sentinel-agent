@@ -103,6 +103,24 @@ CREATE TABLE IF NOT EXISTS inteligencia_empresa (
 );
 
 -- ============================================================
+-- Promoter Briefs — roteiro de abordagem por lead
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS promoter_briefs (
+    id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    lead_id             UUID REFERENCES leads(id) ON DELETE CASCADE UNIQUE,
+    score               NUMERIC(5,2),
+    rotulo              TEXT,
+    frase_abertura      TEXT,
+    demo_recomendada    TEXT,
+    argumento           TEXT,
+    sinais_interesse    TEXT,
+    como_fechar         TEXT,
+    alertas             TEXT,
+    gerado_em           TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ============================================================
 -- Auditoria: registra toda mudança de status nas inscrições
 -- ============================================================
 
