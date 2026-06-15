@@ -1,7 +1,7 @@
 # Vigil Sentinel Agent
 
-**Case técnico — vaga AI Engineer @ Pareto**
-Candidato: Silas Luiz Bom Fim
+**Case técnico**
+ **Silas Luiz Bom Fim**
 
 Sistema autônomo de gestão de funil para o evento **Vigil Summit 2026 — Segurança para a Era da IA** (120 participantes, público B2B: CISOs, CTOs e Diretores de TI).
 
