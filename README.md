@@ -13,7 +13,7 @@ O agente gerencia o ciclo completo do lead: captação → enriquecimento → en
 ## Arquitetura
 
 ```
-landing.py                  ← Formulário de captação (Streamlit)
+Home.py                     ← Formulário de captação (Streamlit)
 │
 ├── db/schema.sql            ← Schema PostgreSQL (Supabase)
 │   └── vw_funil_leads       ← View analítica que alimenta o dashboard
@@ -28,8 +28,8 @@ landing.py                  ← Formulário de captação (Streamlit)
 │   └── data_rights.py       ← LGPD: exportação, exclusão e revogação
 │
 └── pages/
-    ├── Dashboard.py         ← Painel de monitoramento do funil (Streamlit)
-    └── Privacidade.py       ← Política de privacidade (LGPD)
+    ├── 2_Dashboard.py       ← Painel de monitoramento do funil (Streamlit)
+    └── 1_Privacidade.py     ← Política de privacidade (LGPD)
 ```
 
 ### Diagrama do funil
@@ -134,10 +134,10 @@ O script cria todas as tabelas, o trigger de auditoria, a view analítica e inse
 
 ```bash
 # Landing page (captação de leads)
-streamlit run landing.py
+streamlit run Home.py
 
 # Dashboard (monitoramento — abre em nova aba ou porta diferente)
-streamlit run pages/Dashboard.py
+streamlit run pages/2_Dashboard.py
 ```
 
 ### 6. Fluxo de demonstração
