@@ -6,7 +6,7 @@
 -- Eventos (ex: Vigil Summit)
 CREATE TABLE IF NOT EXISTS eventos (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    nome        TEXT NOT NULL,
+    nome        TEXT NOT NULL UNIQUE,
     data        DATE NOT NULL,
     local       TEXT,
     capacidade  INTEGER DEFAULT 120,
@@ -191,4 +191,7 @@ GROUP BY l.id, l.nome, l.email, l.cargo, l.empresa,
 -- ============================================================
 INSERT INTO eventos (nome, data, local, capacidade)
 VALUES ('Vigil Summit — Segurança para a Era da IA', '2026-09-20', 'São Paulo, SP', 120)
-ON CONFLICT DO NOTHING;
+ON CONFLICT (nome) DO UPDATE SET
+    data       = EXCLUDED.data,
+    local      = EXCLUDED.local,
+    capacidade = EXCLUDED.capacidade;
