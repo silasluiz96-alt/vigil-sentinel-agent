@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS leads (
     areas_interesse  TEXT[],  -- ex: {"Conformidade regulatória","Liderança"}
     formacao_atual   TEXT,    -- ex: "MBA em Gestão de TI", "CISSP em andamento"
     opt_out          BOOLEAN DEFAULT FALSE,  -- revogação de consentimento (LGPD Art. 8º §5º)
+    consentimento_em TIMESTAMPTZ,            -- timestamp do aceite explícito (LGPD Art. 8º)
     created_at       TIMESTAMPTZ DEFAULT NOW()
 );
 

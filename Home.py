@@ -7,6 +7,7 @@ o enriquecimento de perfil em background.
 """
 
 import streamlit as st
+from datetime import datetime
 from db.client import get_supabase
 
 st.set_page_config(
@@ -162,6 +163,7 @@ if submitted:
                 "linkedin": linkedin.strip() or None,
                 "areas_interesse": areas,
                 "formacao_atual": formacao_atual.strip() or None,
+                "consentimento_em": datetime.utcnow().isoformat(),
             }, on_conflict="email").execute()
 
             lead_id = resultado.data[0]["id"]
