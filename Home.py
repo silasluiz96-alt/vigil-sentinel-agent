@@ -171,12 +171,6 @@ with st.form("inscricao", clear_on_submit=False):
         help="Selecione todas que fazem sentido para o seu momento profissional.",
     )
 
-    area_custom = st.text_input(
-        "Outra área? (opcional)",
-        placeholder="Ex: DevSecOps, Zero Trust, Red Team... — separe por vírgula se houver mais de uma",
-        help="Não encontrou sua área na lista? Digite aqui.",
-    )
-
     formacao_atual = st.text_input(
         "Está estudando algo atualmente? (opcional)",
         placeholder="Ex: MBA em Gestão de TI, CISSP em andamento, Pós em Segurança da Informação...",
@@ -205,10 +199,6 @@ with st.form("inscricao", clear_on_submit=False):
 # Processamento do formulário
 # ------------------------------------------------------------------
 if submitted:
-    # Mescla áreas da lista com texto livre digitado
-    areas_custom = [a.strip() for a in area_custom.split(",") if a.strip()] if area_custom else []
-    areas_final = areas + [a for a in areas_custom if a not in areas]
-
     erros = []
     campos_obrigatorios = {"Nome": nome, "E-mail": email, "Cargo": cargo, "Empresa": empresa}
     faltando = [k for k, v in campos_obrigatorios.items() if not v.strip()]
@@ -216,7 +206,7 @@ if submitted:
         erros.append(f"Preencha os campos obrigatórios: {', '.join(faltando)}")
     if not consentimento:
         erros.append("É necessário aceitar os termos de consentimento para prosseguir (Art. 8º LGPD).")
-    if not areas_final:
+    if not areas:
         erros.append("Selecione ou digite ao menos uma área de interesse.")
 
     if erros:
@@ -236,7 +226,7 @@ if submitted:
                 "cargo": cargo.strip(),
                 "empresa": empresa.strip(),
                 "linkedin": linkedin.strip() or None,
-                "areas_interesse": areas_final,
+                "areas_interesse": areas,
                 "formacao_atual": formacao_atual.strip() or None,
                 "consentimento_em": datetime.utcnow().isoformat(),
             }, on_conflict="email").execute()
