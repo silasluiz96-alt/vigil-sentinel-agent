@@ -163,6 +163,48 @@ disparar_pos_evento()                 # separa presentes de no-shows automaticam
 
 ---
 
+## Plano de Execução — Primeiros 5 Dias
+
+> **Contexto:** plano fictício construído sobre o cenário real de implementação deste projeto.
+
+### Dia 1 — Fundação
+- Provisionar projeto Supabase (tier gratuito) e criar organização no GitHub
+- Executar `db/schema.sql` no SQL Editor do Supabase
+- Configurar variáveis de ambiente no `.env` (Supabase, OpenAI, Tavily, Mailtrap)
+- Validar conexão e integridade com `scripts/validar_banco.py`
+
+**Critério de sucesso:** banco acessível, evento Vigil Summit inserido, zero erros de conexão.
+
+### Dia 2 — Captação
+- Fazer deploy da landing page (`Home.py`) no Streamlit Cloud com secrets configurados
+- Cadastrar as primeiras personas de teste manualmente via formulário
+- Verificar inscrições, `consentimento_em` e `opt_out` no Table Editor do Supabase
+
+**Critério de sucesso:** leads com `status=inscrito` e `consentimento_em` preenchido; página de privacidade acessível.
+
+### Dia 3 — Inteligência e Scoring
+- Rodar `enriquecer_pendentes()` — busca Tavily + extração LLM para todos os leads
+- Rodar `calcular_score()` — Decision Tree gera rótulos Alta / Média / Baixa
+- Rodar `pesquisar_todas_empresas()` — inteligência de mercado em 5 ângulos por empresa
+
+**Critério de sucesso:** tabelas `enriquecimento`, `lead_scores` e `inteligencia_empresa` populadas sem erros.
+
+### Dia 4 — Briefs e Régua Pré-Evento
+- Rodar `gerar_briefs_prioritarios()` — Promoter Briefs para leads Alta e Média via LangGraph
+- Enviar etapa 1 da régua pré-evento (`enviar_etapa(lead_id, etapa=1)`) para todos os inscritos
+- Validar e-mails gerados no Mailtrap (sandbox): assunto, personalização e rodapé LGPD
+
+**Critério de sucesso:** `promoter_briefs` populada; e-mails visíveis no Mailtrap com abertura de parágrafo personalizada para cada lead.
+
+### Dia 5 — Dashboard e Entrega
+- Fazer deploy do dashboard (`pages/2_Dashboard.py`) como segunda app no Streamlit Cloud
+- Configurar credenciais de staff em `st.secrets["staff"]` no painel Streamlit
+- Enviar URL pública + credenciais de acesso para o time avaliador
+
+**Critério de sucesso:** dashboard acessível via URL pública, login funcional, métricas do funil visíveis (inscritos → confirmados → presentes → reuniões).
+
+---
+
 ## Cenário de escala
 
 Para um evento com 10x o volume (1.200 leads):
