@@ -287,7 +287,6 @@ with tab1:
         filtro = st.selectbox(
             "Filtrar por propensão",
             ["Todos", "Alta", "Média", "Baixa"],
-            horizontal=True,
         )
         if filtro != "Todos":
             df_rank = df_rank[df_rank["rotulo"] == filtro]
