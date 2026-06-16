@@ -45,6 +45,24 @@ st.markdown("""
         font-size: 0.85rem;
         margin: 0.2rem;
     }
+    .card-sucesso {
+        background: linear-gradient(135deg, #0d2137 0%, #0a1a2e 100%);
+        border: 1px solid #00d4ff55;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        margin: 1.5rem 0;
+    }
+    .card-sucesso h2 { color: #00d4ff; margin-bottom: 0.5rem; }
+    .card-sucesso p { color: #c9d1d9; margin: 0.3rem 0; }
+    .card-erro {
+        background: #1a0d0d;
+        border: 1px solid #ff4b4b88;
+        border-radius: 8px;
+        padding: 1rem 1.5rem;
+        margin: 0.5rem 0;
+        color: #ff6b6b;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -72,6 +90,39 @@ st.markdown("""
 st.divider()
 
 # ------------------------------------------------------------------
+# Card de confirmação (exibido após inscrição bem-sucedida)
+# ------------------------------------------------------------------
+if st.session_state.get("inscricao_ok"):
+    nome_confirmado = st.session_state.get("nome_confirmado", "")
+    st.markdown(f"""
+    <div class="card-sucesso">
+        <div style="font-size:3rem">🛡️</div>
+        <h2>Inscrição confirmada, {nome_confirmado}!</h2>
+        <p>Você está na lista do Vigil Summit 2026.</p>
+        <p style="margin-top:1rem; color:#00d4ff;">
+            📧 Um e-mail de boas-vindas com todos os detalhes do evento<br>
+            foi enviado para você. Fique de olho na caixa de entrada.
+        </p>
+        <p style="margin-top:1rem; font-size:0.85rem; color:#6b7280;">
+            20 e 21 de setembro de 2026 · São Paulo, SP
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    if st.button("Indicar um colega →"):
+        del st.session_state["inscricao_ok"]
+        del st.session_state["nome_confirmado"]
+        st.rerun()
+
+    st.divider()
+    st.markdown(
+        "<center><small>Vigil Summit 2026 · Realização Vigil.AI · "
+        "Dúvidas? contato@vigilsummit.com.br</small></center>",
+        unsafe_allow_html=True,
+    )
+    st.stop()
+
+# ------------------------------------------------------------------
 # Formulário de inscrição
 # ------------------------------------------------------------------
 st.markdown("## Garanta sua vaga")
@@ -84,9 +135,24 @@ AREAS_INTERESSE = [
     "Segurança em cloud",
     "Resposta a incidentes",
     "Liderança e gestão de times",
+    "Governança de TI",
+    "Gestão de identidade e acesso (IAM)",
+    "Segurança em aplicações (AppSec)",
+    "Threat Intelligence",
+    "DevSecOps",
+    "Segurança em OT/IoT",
+    "Continuidade de negócios (BCP/DRP)",
+    "Arquitetura Zero Trust",
 ]
 
-with st.form("inscricao", clear_on_submit=True):
+# Erros da submissão anterior (preservados entre reruns)
+erros = st.session_state.get("erros_form", [])
+if erros:
+    for erro in erros:
+        st.markdown(f'<div class="card-erro">⚠️ {erro}</div>', unsafe_allow_html=True)
+    st.session_state["erros_form"] = []
+
+with st.form("inscricao", clear_on_submit=False):
     col1, col2 = st.columns(2)
 
     with col1:
@@ -103,6 +169,12 @@ with st.form("inscricao", clear_on_submit=True):
         "Áreas de interesse *",
         options=AREAS_INTERESSE,
         help="Selecione todas que fazem sentido para o seu momento profissional.",
+    )
+
+    area_custom = st.text_input(
+        "Outra área? (opcional)",
+        placeholder="Ex: DevSecOps, Zero Trust, Red Team... — separe por vírgula se houver mais de uma",
+        help="Não encontrou sua área na lista? Digite aqui.",
     )
 
     formacao_atual = st.text_input(
@@ -133,27 +205,30 @@ with st.form("inscricao", clear_on_submit=True):
 # Processamento do formulário
 # ------------------------------------------------------------------
 if submitted:
+    # Mescla áreas da lista com texto livre digitado
+    areas_custom = [a.strip() for a in area_custom.split(",") if a.strip()] if area_custom else []
+    areas_final = areas + [a for a in areas_custom if a not in areas]
+
+    erros = []
     campos_obrigatorios = {"Nome": nome, "E-mail": email, "Cargo": cargo, "Empresa": empresa}
     faltando = [k for k, v in campos_obrigatorios.items() if not v.strip()]
-
     if faltando:
-        st.error(f"Preencha os campos obrigatórios: {', '.join(faltando)}")
+        erros.append(f"Preencha os campos obrigatórios: {', '.join(faltando)}")
+    if not consentimento:
+        erros.append("É necessário aceitar os termos de consentimento para prosseguir (Art. 8º LGPD).")
+    if not areas_final:
+        erros.append("Selecione ou digite ao menos uma área de interesse.")
 
-    elif not consentimento:
-        st.error("É necessário aceitar os termos de consentimento para prosseguir (Art. 8º LGPD).")
-
-    elif not areas:
-        st.error("Selecione ao menos uma área de interesse.")
-
+    if erros:
+        st.session_state["erros_form"] = erros
+        st.rerun()
     else:
         try:
             db = get_supabase()
 
-            # Busca o evento ativo
             evento = db.table("eventos").select("id").limit(1).execute().data
             evento_id = evento[0]["id"] if evento else None
 
-            # Salva o lead (ignora duplicata por e-mail)
             resultado = db.table("leads").upsert({
                 "nome": nome.strip(),
                 "email": email.strip().lower(),
@@ -161,14 +236,13 @@ if submitted:
                 "cargo": cargo.strip(),
                 "empresa": empresa.strip(),
                 "linkedin": linkedin.strip() or None,
-                "areas_interesse": areas,
+                "areas_interesse": areas_final,
                 "formacao_atual": formacao_atual.strip() or None,
                 "consentimento_em": datetime.utcnow().isoformat(),
             }, on_conflict="email").execute()
 
             lead_id = resultado.data[0]["id"]
 
-            # Cria a inscrição no evento
             if evento_id:
                 db.table("inscricoes").upsert({
                     "lead_id": lead_id,
@@ -176,17 +250,16 @@ if submitted:
                     "status": "inscrito",
                 }, on_conflict="lead_id,evento_id").execute()
 
-            st.success(f"**Inscrição confirmada, {nome.split()[0]}!** 🎉")
-            st.info(
-                "Em breve você receberá um e-mail de confirmação com os detalhes do evento. "
-                "Fique de olho na sua caixa de entrada."
-            )
+            st.session_state["inscricao_ok"] = True
+            st.session_state["nome_confirmado"] = nome.strip().split()[0]
+            st.rerun()
 
         except Exception as e:
             if "unique" in str(e).lower() or "duplicate" in str(e).lower():
-                st.warning("Este e-mail já está cadastrado. Você já está na lista! 😊")
+                st.session_state["erros_form"] = ["Este e-mail já está cadastrado. Você já está na lista!"]
             else:
-                st.error("Ocorreu um erro ao processar sua inscrição. Tente novamente em instantes.")
+                st.session_state["erros_form"] = ["Ocorreu um erro ao processar sua inscrição. Tente novamente em instantes."]
+            st.rerun()
 
 # ------------------------------------------------------------------
 # Rodapé
