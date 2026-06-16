@@ -87,7 +87,7 @@ ETAPAS = {
 CONTEXTO_ETAPA = {
     1: """
 Escreva um e-mail de boas-vindas caloroso confirmando a inscrição do lead no Vigil Summit.
-Mencione que o evento acontece em 15 de agosto de 2026 em São Paulo.
+Mencione que o evento acontece em 20 e 21 de setembro de 2026 em São Paulo.
 Use o perfil abaixo para personalizar a abertura — faça o lead sentir que o e-mail
 foi escrito especificamente para ele, não para uma lista genérica.
 Finalize convidando o lead a salvar a data na agenda.
