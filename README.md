@@ -90,6 +90,85 @@ Consentimento explícito no cadastro (Art. 8), política de privacidade detalhad
 
 ---
 
+## Réguas de Comunicação
+
+### Pré-evento — 5 etapas
+
+| Etapa | Momento | Assunto principal | Assunto alternativo (não abriu anterior) | Regra de negócio |
+|---|---|---|---|---|
+| 1 | Imediato após inscrição | `Sua inscrição no Vigil Summit está confirmada ✅` | `Bem-vindo ao Vigil Summit — veja o que esperar` | Enviado para todos os inscritos com opt_out=false |
+| 2 | 7 dias antes | `Vigil Summit: o que você vai encontrar em 7 dias` | `7 dias para o maior evento de segurança do ano` | Se houver outros leads da mesma empresa, inclui sugestão de carona (sem citar nomes) |
+| 3 | 3 dias antes | `Confirme sua presença — faltam 3 dias` | `Só mais 3 dias: você vem ao Vigil Summit?` | Tom de urgência leve para quem ainda não confirmou; mesma regra de carona da etapa 2 |
+| 4 | 1 dia antes | `Tudo pronto para amanhã? Veja os detalhes finais` | `Amanhã é o Vigil Summit — não perca nada` | **Somente confirmados** — leads sem confirmação não recebem esta etapa |
+| 5 | Manhã do evento | `🛡️ Hoje é o dia — Vigil Summit começa às 9h` | `O Vigil Summit começa hoje. Veja como chegar` | **Somente confirmados** — inclui horário de credenciamento (8h30) |
+
+**Regras globais da régua pré-evento:**
+- Todo e-mail é gerado pelo LLM com abertura personalizada baseada no `resumo_perfil` do enriquecimento
+- Rodapé LGPD obrigatório em todos os e-mails com link de descadastro
+- `opt_out=true` bloqueia o envio antes de qualquer processamento
+- Cada envio é registrado na tabela `comunicacoes` com status, assunto e corpo
+
+---
+
+### Pós-evento — 2 fluxos paralelos
+
+**Fluxo A — Presentes** (compareceram ao evento):
+
+| Etapa | Momento | Assunto | Tom por score |
+|---|---|---|---|
+| 1 | 1 dia depois | `Foi ótimo ter você no Vigil Summit 🛡️` | Caloroso, sem pressão comercial |
+| 2 | 3 dias depois | `Que tal continuarmos a conversa? 30 minutos podem mudar sua estratégia` | **Alta:** direto, ROI e urgência leve / **Média:** consultivo / **Baixa:** relacionamento |
+| 3 | 7 dias depois | `Última mensagem — e uma porta aberta` | Encerra sem pressão, oferece relatório do setor |
+
+**Fluxo B — No-shows** (inscreveram mas não foram):
+
+| Etapa | Momento | Assunto | Tom |
+|---|---|---|---|
+| 1 | 1 dia depois | `Sentimos sua falta no Vigil Summit — mas trouxemos o evento até você` | Compreensivo, oferece resumo dos insights |
+| 2 | 5 dias depois | `A demo que você não viu — que tal 20 minutos?` | Calibrado por score — proposta de demo individual |
+
+**Separação automática:** `disparar_pos_evento()` lê o status da inscrição (`presente` vs `no_show`) e distribui cada lead para o fluxo correto sem intervenção manual.
+
+---
+
+## Decisões Estratégicas e Racional
+
+### Decisão 1 — Decision Tree em vez de Random Forest ou Regressão Logística
+
+**Escolha:** `DecisionTreeClassifier` (scikit-learn, `max_depth=4`)
+
+**Alternativas descartadas:**
+- *Random Forest:* melhor acurácia, mas resultado de conjunto de árvores — não é possível explicar ao promotor por que um lead é Alta sem inspecionar dezenas de árvores. Descartado por falta de interpretabilidade.
+- *Regressão Logística:* boa para datasets grandes e balanceados. Com 5 personas sintéticas e features ordinais (pesos manuais), a árvore simples generaliza melhor e é auditável visualmente.
+
+**Por que importa:** o Art. 20 da LGPD exige que decisões automatizadas sejam explicáveis ao titular. A Decision Tree permite mostrar exatamente quais features determinaram o rótulo — requisito legal atendido nativamente.
+
+---
+
+### Decisão 2 — LangGraph em vez de LangChain puro para o Promoter Brief
+
+**Escolha:** `LangGraph` com grafo de 3 nós tipados (`coletar_contexto → gerar_brief → salvar_brief`)
+
+**Alternativas descartadas:**
+- *LangChain puro (chain sequencial):* mais simples de implementar, mas o estado entre etapas é implícito — difícil rastrear em qual nó uma falha ocorreu. Descartado por falta de observabilidade.
+- *Chamada direta ao LLM sem orquestrador:* funciona para casos simples, mas não escala para pipelines com coleta de múltiplas fontes (lead + enriquecimento + intel de empresa) antes da geração.
+
+**Por que importa:** o Promoter Brief agrega dados de 4 tabelas antes de chamar o LLM. O grafo tipado (`BriefState`) garante que cada nó recebe exatamente o que precisa e que falhas são rastreáveis por nó — essencial para debugging em produção.
+
+---
+
+### Decisão 3 — Mailtrap (sandbox) em vez de SendGrid ou Amazon SES
+
+**Escolha:** Mailtrap sandbox SMTP
+
+**Alternativas descartadas:**
+- *SendGrid:* requer domínio verificado e configuração de DNS (SPF, DKIM, DMARC). Inviável para uma demo sem domínio próprio operacional.
+- *Amazon SES:* mesma exigência de domínio verificado, mais complexidade de IAM. Custo e setup desproporcional para demonstração.
+
+**Por que importa:** o objetivo da demo é provar que o pipeline de e-mail funciona — geração, personalização, rodapé LGPD e registro no banco. O Mailtrap captura todos os e-mails em sandbox sem risco de spam e com visualização completa do HTML gerado. Em produção, a troca para SendGrid é uma alteração de 3 linhas em `pre_event_sequence.py` e `post_event_sequence.py`.
+
+---
+
 ## Como rodar
 
 ### 1. Pré-requisitos
