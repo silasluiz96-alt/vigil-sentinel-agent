@@ -210,7 +210,7 @@ DADOS_TREINO = [
 _X = np.array([d[:7] for d in DADOS_TREINO])
 _y = np.array([d[7]  for d in DADOS_TREINO])
 
-_modelo = DecisionTreeClassifier(max_depth=4, random_state=42)
+_modelo = DecisionTreeClassifier(max_depth=2, min_samples_leaf=2, random_state=42)
 _modelo.fit(_X, _y)
 
 
