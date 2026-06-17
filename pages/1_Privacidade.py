@@ -46,13 +46,35 @@ Você pode a qualquer momento:
 Para exercer qualquer direito: **privacidade@vigilsummit.com.br**
 Prazo de resposta: até 15 dias úteis.
 
-## 6. Segurança
+## 6. Compartilhamento de dados (Art. 18º, VII)
+Para operacionalizar o evento, seus dados podem ser processados pelos seguintes fornecedores,
+exclusivamente para as finalidades descritas acima:
+
+| Fornecedor | Finalidade | Dados compartilhados |
+|---|---|---|
+| **OpenAI** | Geração de comunicações personalizadas via LLM | Nome, cargo, empresa, áreas de interesse |
+| **Tavily** | Busca web para enriquecimento de perfil profissional | Nome e empresa (consulta pública) |
+| **Mailtrap** | Envio dos e-mails do evento (sandbox de demonstração) | Nome, e-mail, corpo da mensagem |
+| **Supabase** | Armazenamento do banco de dados do evento | Todos os dados coletados |
+
+Nenhum dado é vendido ou compartilhado com terceiros para fins comerciais.
+
+## 7. Segurança (Art. 46º)
 Adotamos medidas técnicas de segurança conforme o Art. 46º da LGPD:
 dados armazenados em banco com acesso restrito, credenciais protegidas
-por variáveis de ambiente e comunicações via canal criptografado.
+por variáveis de ambiente e comunicações via canal criptografado (HTTPS/TLS).
 
-## 7. Contato
-Dúvidas sobre privacidade: **privacidade@vigilsummit.com.br**
+## 8. Encarregado pelo Tratamento de Dados — DPO (Art. 41º)
+O encarregado responsável pelo tratamento dos dados pessoais coletados neste evento é:
+
+**Silas Luiz Bom Fim**
+E-mail: **privacidade@vigilsummit.com.br**
+Prazo de resposta: até 15 dias úteis.
+
+O encarregado atende solicitações dos titulares e da ANPD sobre o tratamento de dados.
+
+## 9. Contato
+Dúvidas sobre privacidade ou para exercer seus direitos: **privacidade@vigilsummit.com.br**
 """)
 
 st.divider()

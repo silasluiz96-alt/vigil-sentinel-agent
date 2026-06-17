@@ -183,6 +183,7 @@ def _gerar_corpo(lead: dict, enriquecimento: dict, score_data: dict, instrucao: 
     rotulo = score_data.get("rotulo", "Média")
     prompt = PROMPT_EMAIL.format(
         nome=lead.get("nome", ""),
+        email=lead.get("email", ""),
         cargo=lead.get("cargo") or enriquecimento.get("cargo_real") or "",
         empresa=lead.get("empresa") or enriquecimento.get("empresa_confirmada") or "",
         setor=enriquecimento.get("setor") or "",

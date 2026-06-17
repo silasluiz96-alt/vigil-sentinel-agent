@@ -135,7 +135,7 @@ Consentimento explícito no cadastro (Art. 8), política de privacidade detalhad
 
 ### Decisão 1 — Decision Tree em vez de Random Forest ou Regressão Logística
 
-**Escolha:** `DecisionTreeClassifier` (scikit-learn, `max_depth=4`)
+**Escolha:** `DecisionTreeClassifier` (scikit-learn, `max_depth=2`, `min_samples_leaf=2`)
 
 **Alternativas descartadas:**
 - *Random Forest:* melhor acurácia, mas resultado de conjunto de árvores — não é possível explicar ao promotor por que um lead é Alta sem inspecionar dezenas de árvores. Descartado por falta de interpretabilidade.
