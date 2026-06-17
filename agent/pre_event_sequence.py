@@ -209,6 +209,7 @@ def _gerar_corpo_email(lead: dict, enriquecimento: dict, etapa: int, com_carona:
 
     prompt = PROMPT_EMAIL.format(
         nome=lead.get("nome", ""),
+        email=lead.get("email", ""),
         resumo_perfil=enriquecimento.get("resumo_perfil") or "Profissional de TI ou segurança.",
         areas_interesse=", ".join(lead.get("areas_interesse") or []) or "Segurança e tecnologia",
         formacao_atual=lead.get("formacao_atual") or "Não informado",
