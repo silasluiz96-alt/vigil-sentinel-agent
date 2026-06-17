@@ -39,6 +39,10 @@ st.set_page_config(
 
 STAFF_CREDENTIALS = dict(st.secrets.get("staff", {}))
 
+if st.query_params.get("logout") == "1":
+    st.session_state.autenticado = False
+    st.query_params.clear()
+
 if "autenticado" not in st.session_state:
     st.session_state.autenticado = False
 
