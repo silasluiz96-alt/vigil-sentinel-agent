@@ -76,6 +76,13 @@ if not st.session_state.autenticado:
 # A partir daqui só quem autenticou chega
 # ------------------------------------------------------------------
 
+# Botão de logout no sidebar
+with st.sidebar:
+    st.markdown("---")
+    if st.button("🚪 Sair", use_container_width=True):
+        st.session_state.autenticado = False
+        st.rerun()
+
 # Tema cybersegurança — mesma identidade visual da landing page
 st.markdown("""
 <style>
