@@ -205,12 +205,21 @@ DADOS_TREINO = [
     [0.9,  0.9,  1.0,  0.95, 0.9,  0.9, 1.0, 1],
     [0.1,  0.4,  0.2,  0.0,  0.0,  0.0, 0.0, 0],
     [0.5,  0.65, 0.45, 0.75, 0.6,  0.5, 0.0, 0],
+    # Perfis borderline — conversão incerta, criam folhas mistas na árvore
+    [0.7,  0.65, 0.7,  0.5,  0.0,  0.3, 0.0, 1],  # gerente TI, sem engajamento, converteu
+    [0.7,  0.65, 0.7,  0.5,  0.0,  0.3, 0.0, 0],  # mesmo perfil, não converteu
+    [0.5,  0.85, 0.7,  0.75, 0.6,  0.4, 0.0, 1],  # analista em saúde, algum interesse
+    [0.5,  0.85, 0.7,  0.75, 0.6,  0.4, 0.0, 0],  # mesmo perfil, não converteu
+    [0.5,  0.6,  0.45, 0.8,  0.75, 0.5, 0.0, 1],  # analista com cert. segurança
+    [0.5,  0.6,  0.45, 0.8,  0.75, 0.5, 0.0, 0],  # mesmo perfil, sem conversão
+    [0.7,  0.8,  0.85, 0.5,  0.0,  0.2, 0.0, 1],  # decisor em saúde, baixo engajamento
+    [0.7,  0.8,  0.85, 0.5,  0.0,  0.2, 0.0, 0],  # mesmo perfil, não converteu
 ]
 
 _X = np.array([d[:7] for d in DADOS_TREINO])
 _y = np.array([d[7]  for d in DADOS_TREINO])
 
-_modelo = DecisionTreeClassifier(max_depth=4, random_state=42)
+_modelo = DecisionTreeClassifier(max_depth=2, min_samples_leaf=2, random_state=42)
 _modelo.fit(_X, _y)
 
 
