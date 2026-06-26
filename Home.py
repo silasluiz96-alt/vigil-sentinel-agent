@@ -7,8 +7,38 @@ o enriquecimento de perfil em background.
 """
 
 import streamlit as st
+import threading
 from datetime import datetime
 from db.client import get_supabase
+
+
+def _pipeline_background(lead_id: str) -> None:
+    """Roda enriquecimento → scoring → brief (se Alta) → e-mail em background."""
+    try:
+        from agent.enrichment import enriquecer_lead
+        enriquecer_lead(lead_id)
+    except Exception:
+        pass
+
+    try:
+        from agent.lead_scoring import calcular_score
+        resultado = calcular_score(lead_id)
+        rotulo = resultado.get("rotulo", "")
+    except Exception:
+        rotulo = ""
+
+    if rotulo == "Alta":
+        try:
+            from agent.promoter_brief import gerar_brief_lead
+            gerar_brief_lead(lead_id)
+        except Exception:
+            pass
+
+    try:
+        from agent.pre_event_sequence import enviar_etapa
+        enviar_etapa(lead_id, 1)
+    except Exception:
+        pass
 
 st.set_page_config(
     page_title="Vigil Summit 2026 — Inscrição",
@@ -239,6 +269,8 @@ if submitted:
                     "evento_id": evento_id,
                     "status": "inscrito",
                 }, on_conflict="lead_id,evento_id").execute()
+
+            threading.Thread(target=_pipeline_background, args=(lead_id,), daemon=True).start()
 
             st.session_state["inscricao_ok"] = True
             st.session_state["nome_confirmado"] = nome.strip().split()[0]
